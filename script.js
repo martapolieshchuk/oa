@@ -1,14 +1,23 @@
 
 /**
  * PWL Guest Wi-Fi Landing Page
- * JavaScript for GitHub Pages
  *
- * Form integration:
  * GitHub Pages -> Google Apps Script -> Google Sheets
+ *
+ * Google Sheets: PWL | Lead Database
+ * Worksheet: Leads
  */
 
 // ==========================================
-// 1. MOBILE NAVIGATION
+// 1. GOOGLE APPS SCRIPT CONNECTION
+// ==========================================
+
+const GOOGLE_APPS_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbzx7snwRREKeiUz7XNbRPHZaZmTWx8y6-ryvRk47UbBUmiaM7Jjs79fjJ154_qhwe1f3g/exec';
+
+
+// ==========================================
+// 2. MOBILE NAVIGATION
 // ==========================================
 
 const toggle = document.querySelector('.mobile-menu-toggle');
@@ -31,23 +40,10 @@ if (toggle && menu) {
     link.addEventListener('click', () => {
       menu.hidden = true;
 
-      toggle.setAttribute(
-        'aria-expanded',
-        'false'
-      );
+      toggle.setAttribute('aria-expanded', 'false');
     });
   });
 }
-
-
-// ==========================================
-// 2. GOOGLE APPS SCRIPT CONNECTION
-// ==========================================
-
-// Updated Google Apps Script Web App URL
-
-const GOOGLE_APPS_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbzrSsoqsT3E64pz5EkMtUbi2Dlb3FtE8ScwNK5UU2o6lNZmzD5GJJNAovK9nNUARHgTRA/exec';
 
 
 // ==========================================
@@ -55,48 +51,41 @@ const GOOGLE_APPS_SCRIPT_URL =
 // ==========================================
 
 const leadForm = document.querySelector('#pwl-lead-form');
-
 const leadSubmit = document.querySelector('#lead-submit');
-
 const formStatus = document.querySelector('#form-status');
 
 
 // ==========================================
-// 4. FORM INITIALIZATION
+// 4. FORM CONNECTION AND VALIDATION
 // ==========================================
 
 if (leadForm && leadSubmit && formStatus) {
 
-  // Check Google Apps Script URL format
+  // Validate Apps Script URL
   const validEndpoint =
     /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/
       .test(GOOGLE_APPS_SCRIPT_URL);
 
   if (validEndpoint) {
 
-    // Connect form to Google Apps Script
+    // Connect HTML form to Google Apps Script
     leadForm.action = GOOGLE_APPS_SCRIPT_URL;
-
-    // Use POST request
     leadForm.method = 'POST';
-
-    // Open Apps Script confirmation in new tab
     leadForm.target = '_blank';
 
     // Enable submit button
     leadSubmit.disabled = false;
 
-    // Initial status message
+    // Initial message
     formStatus.textContent =
       'Complete the form to submit your request.';
 
-    // Handle form submission
+    // Validate before sending
     leadForm.addEventListener('submit', function(event) {
 
-      // Check required HTML fields
+      // HTML validates only required fields
       if (!leadForm.checkValidity()) {
         event.preventDefault();
-
         leadForm.reportValidity();
 
         formStatus.textContent =
@@ -105,7 +94,7 @@ if (leadForm && leadSubmit && formStatus) {
         return;
       }
 
-      // Show submission status
+      // Confirmation will open in a new tab
       formStatus.textContent =
         'Your request is being submitted. ' +
         'Please check the confirmation page ' +
@@ -115,7 +104,6 @@ if (leadForm && leadSubmit && formStatus) {
 
   } else {
 
-    // Invalid or missing Apps Script URL
     leadSubmit.disabled = true;
 
     formStatus.textContent =
@@ -128,35 +116,32 @@ if (leadForm && leadSubmit && formStatus) {
   }
 
 } else {
-
   console.error(
-    'PWL: One or more form elements were not found.'
+    'PWL: Form elements were not found.'
   );
 }
 
 
 // ==========================================
-// 5. FORM FIELD VALIDATION
+// 5. FORM FIELD MAPPING
 // ==========================================
 
-// Comments are optional.
-// Required fields are controlled by HTML:
-// - Name
-// - Email
-// - Business Type
-// - Guest Wi-Fi Goal
-// - Number of Locations
-// - Consent checkbox
-
-// All submitted field names match Code.gs:
-// name
-// email
-// business_type
-// guest_wifi_goal
-// number_of_locations
-// comments
-// consent
-// website_check
+/*
+ * Fields submitted to Google Apps Script:
+ *
+ * name                 -> Name
+ * email                -> Email
+ * business_type        -> Business Type
+ * guest_wifi_goal      -> Guest Wi-Fi Goal
+ * number_of_locations  -> Number of Locations
+ * comments             -> Comments (OPTIONAL)
+ * consent              -> Required checkbox
+ * website_check        -> Honeypot spam protection
+ *
+ * No additional JavaScript mapping is needed:
+ * the browser submits form fields using
+ * their HTML "name" attributes.
+ */
 
 
 // ==========================================
@@ -176,14 +161,12 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     const targetSection = document.querySelector(targetId);
 
     if (targetSection) {
-
       event.preventDefault();
 
       targetSection.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
-
     }
 
   });
